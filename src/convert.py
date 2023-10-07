@@ -5,8 +5,12 @@ import src.settings as s
 from urllib.parse import unquote, urlparse
 from supervisely.io.fs import get_file_name, get_file_size
 import shutil
-
+import json
 from tqdm import tqdm
+from glob import glob
+import imagesize
+import csv
+
 
 def download_dataset(teamfiles_dir: str) -> str:
     """Use it for large datasets to convert them on the instance"""
@@ -29,7 +33,7 @@ def download_dataset(teamfiles_dir: str) -> str:
             total=fsize,
             unit="B",
             unit_scale=True,
-        ) as pbar:        
+        ) as pbar:
             api.file.download(team_id, teamfiles_path, local_path, progress_cb=pbar)
         dataset_path = unpack_if_archive(local_path)
 
@@ -57,7 +61,8 @@ def download_dataset(teamfiles_dir: str) -> str:
 
         dataset_path = storage_dir
     return dataset_path
-    
+
+
 def count_files(path, extension):
     count = 0
     for root, dirs, files in os.walk(path):
@@ -65,21 +70,57 @@ def count_files(path, extension):
             if file.endswith(extension):
                 count += 1
     return count
-    
+
+
+def create_ann(image_path):
+    labels = []
+    bbox = img_ann_dict.get(sly.fs.get_file_name_with_ext(image_path))
+
+    x_min, y_min, x_max, y_max, tag_value = bbox
+
+    rectangle = sly.Rectangle(top=int(y_min), left=int(x_min), bottom=int(y_max), right=int(x_max))
+    tag = sly.Tag(tm_sl, int(tag_value))
+
+    label = sly.Label(rectangle, obj_class, tags=[tag])
+    labels.append(label)
+
+    img_width, img_height = imagesize.get(image_path)
+    return sly.Annotation(img_size=(img_height, img_width), labels=labels)
+
+
+obj_class = sly.ObjClass("sign", sly.Rectangle, color=[255, 0, 0])
+
+tm_sl = sly.TagMeta("speed limit", sly.TagValueType.ANY_NUMBER)
+
+with open('/mnt/c/users/german/documents/ItalianSigns/labels/ItalianSigns.csv') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    next(csv_reader)
+    img_ann_dict = {row[0]: row[1:6] for row in csv_reader if len(row)!=0}
+
 def convert_and_upload_supervisely_project(
     api: sly.Api, workspace_id: int, project_name: str
 ) -> sly.ProjectInfo:
-    ### Function should read local dataset and upload it to Supervisely project, then return project info.###
-    raise NotImplementedError("The converter should be implemented manually.")
 
-    # dataset_path = "/local/path/to/your/dataset" # general way
-    # dataset_path = download_dataset(teamfiles_dir) # for large datasets stored on instance
+    project = api.project.create(workspace_id, project_name)
+    meta = sly.ProjectMeta(
+        obj_classes=[obj_class],
+        tag_metas=[tm_sl],
+    )
+    api.project.update_meta(project.id, meta.to_json())
 
-    # ... some code here ...
+    dataset_path = "/mnt/c/users/german/documents/ItalianSigns"
+    dataset = api.dataset.create(project.id, "ds0", change_name_if_conflict=True)
 
-    # sly.logger.info('Deleting temporary app storage files...')
-    # shutil.rmtree(storage_dir)
+    images_pathes = glob(dataset_path + "/images/*.jpg")
 
-    # return project
+    batch_size = 31
+    progress = sly.Progress("Create dataset {}".format("ds0"), len(images_pathes))
+    for img_pathes_batch in sly.batched(images_pathes, batch_size=batch_size):
+        img_names_batch = [sly.fs.get_file_name_with_ext(im_path) for im_path in img_pathes_batch]
 
+        img_infos = api.image.upload_paths(dataset.id, img_names_batch, img_pathes_batch)
+        img_ids = [im_info.id for im_info in img_infos]
 
+        anns = [create_ann(image_path) for image_path in img_pathes_batch]
+        api.annotation.upload_anns(img_ids, anns)
+    return project

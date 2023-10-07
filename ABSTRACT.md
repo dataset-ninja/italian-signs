@@ -1,5 +1,3 @@
+**ItalianSigns** is a dataset containing images of the road context captured by a phone camera. All images were collected in the Reggio Emilia province of Italy. It comprises 362 labelled images, with each image featuring a road sign (specifically, speed limit signs), along with annotations for the associated speed limit number and the bounding box corresponding to the Region of Interest (ROI) of the sign.
 
-Sample image template:
-<img src="https://github.com/dataset-ninja/gland-segmentation/assets/78355358/f158d0dd-71d5-41a2-aba5-4a5f57d54c35" alt="image" width="800">
-
-<span style="font-size: smaller; font-style: italic;">Image description.</span>
+To recognize these road signs, the authors of the study applied preprocessing techniques to clean the images. They also employed HoughCircles to determine the spatial location of the signs and extract the bounding boxes. Additionally, a K-nearest neighbors (KNN) algorithm was utilized on feature vectors extracted via SIFT between the ground truth images and the crops of the inference image.
