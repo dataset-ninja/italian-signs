@@ -21,8 +21,8 @@ HIDE_DATASET = True  # set False when 100% sure about repo quality
 # * After uploading to instance ##
 ##################################
 LICENSE: License = License.GNU_GPL_v3()
-APPLICATIONS: List[Union[Industry, Domain, Research]] = [Domain.Geospatial(), Research.UrbanPlanning()]
-CATEGORY: Category = Category.EnergyAndUtilities()
+APPLICATIONS: List[Union[Industry, Domain, Research]] = [Industry.Automotive(is_used=False)]
+CATEGORY: Category = Category.SelfDriving()
 
 CV_TASKS: List[CVTask] = [CVTask.ObjectDetection()]
 ANNOTATION_TYPES: List[AnnotationType] = [AnnotationType.ObjectDetection()]
@@ -43,7 +43,9 @@ GITHUB_URL: str = "https://github.com/dataset-ninja/italian-signs"
 ##################################
 ### * Optional after uploading ###
 ##################################
-DOWNLOAD_ORIGINAL_URL: Optional[Union[str, dict]] = "https://www.kaggle.com/datasets/officialprojecto/italiansigns/download?datasetVersionNumber=1"
+DOWNLOAD_ORIGINAL_URL: Optional[
+    Union[str, dict]
+] = "https://www.kaggle.com/datasets/officialprojecto/italiansigns/download?datasetVersionNumber=1"
 # Optional link for downloading original dataset (e.g. "https://some.com/dataset/download")
 
 CLASS2COLOR: Optional[Dict[str, List[str]]] = None
@@ -58,8 +60,8 @@ REPOSITORY: Optional[Union[str, List[str], Dict[str, str]]] = None
 CITATION_URL: Optional[str] = None
 AUTHORS: Optional[List[str]] = ["Daniel Rossi", "Riccardo Salami"]
 
-ORGANIZATION_NAME: Optional[Union[str, List[str]]] = "Unimore, Italy"
-ORGANIZATION_URL: Optional[Union[str, List[str]]] = "https://www.unimore.it/"
+ORGANIZATION_NAME: Optional[Union[str, List[str]]] = None
+ORGANIZATION_URL: Optional[Union[str, List[str]]] = None
 
 # Set '__PRETEXT__' or '__POSTTEXT__' as a key with string value to add custom text. e.g. SLYTAGSPLIT = {'__POSTTEXT__':'some text}
 SLYTAGSPLIT: Optional[Dict[str, Union[List[str], str]]] = None
