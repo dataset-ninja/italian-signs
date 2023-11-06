@@ -72,34 +72,34 @@ def count_files(path, extension):
     return count
 
 
-def create_ann(image_path):
-    labels = []
-    bbox = img_ann_dict.get(sly.fs.get_file_name_with_ext(image_path))
-
-    x_min, y_min, x_max, y_max, tag_value = bbox
-
-    rectangle = sly.Rectangle(top=int(y_min), left=int(x_min), bottom=int(y_max), right=int(x_max))
-    tag = sly.Tag(tm_sl, int(tag_value))
-
-    label = sly.Label(rectangle, obj_class, tags=[tag])
-    labels.append(label)
-
-    img_width, img_height = imagesize.get(image_path)
-    return sly.Annotation(img_size=(img_height, img_width), labels=labels)
-
-
-obj_class = sly.ObjClass("sign", sly.Rectangle, color=[255, 0, 0])
-
-tm_sl = sly.TagMeta("speed limit", sly.TagValueType.ANY_NUMBER)
-
-with open('/mnt/c/users/german/documents/ItalianSigns/labels/ItalianSigns.csv') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
-    next(csv_reader)
-    img_ann_dict = {row[0]: row[1:6] for row in csv_reader if len(row)!=0}
-
 def convert_and_upload_supervisely_project(
     api: sly.Api, workspace_id: int, project_name: str
 ) -> sly.ProjectInfo:
+
+    def create_ann(image_path):
+        labels = []
+        bbox = img_ann_dict.get(sly.fs.get_file_name_with_ext(image_path))
+    
+        x_min, y_min, x_max, y_max, tag_value = bbox
+    
+        rectangle = sly.Rectangle(top=int(y_min), left=int(x_min), bottom=int(y_max), right=int(x_max))
+        tag = sly.Tag(tm_sl, int(tag_value))
+    
+        label = sly.Label(rectangle, obj_class, tags=[tag])
+        labels.append(label)
+    
+        img_width, img_height = imagesize.get(image_path)
+        return sly.Annotation(img_size=(img_height, img_width), labels=labels)
+    
+    
+    obj_class = sly.ObjClass("sign", sly.Rectangle, color=[255, 0, 0])
+    
+    tm_sl = sly.TagMeta("speed limit", sly.TagValueType.ANY_NUMBER)
+    
+    with open('/mnt/c/users/german/documents/ItalianSigns/labels/ItalianSigns.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        next(csv_reader)
+        img_ann_dict = {row[0]: row[1:6] for row in csv_reader if len(row)!=0}
 
     project = api.project.create(workspace_id, project_name)
     meta = sly.ProjectMeta(
