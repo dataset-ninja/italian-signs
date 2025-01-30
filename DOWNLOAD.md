@@ -1,6 +1,6 @@
 Dataset **ItalianSigns** can be downloaded in [Supervisely format](https://developer.supervisely.com/api-references/supervisely-annotation-json-format):
 
- [Download](https://www.dropbox.com/scl/fi/atb076el2ffna232dk5jy/italiansigns-DatasetNinja.tar?rlkey=2i6rs5tgsasrnp85amrmmx2r6&dl=1)
+ [Download](https://assets.supervisely.com/remote/eyJsaW5rIjogImZzOi8vYXNzZXRzLzI1MTBfSXRhbGlhblNpZ25zL2l0YWxpYW5zaWducy1EYXRhc2V0TmluamEudGFyIiwgInNpZyI6ICJpZzg3NHlEWmd0cGcwcytLRW11R255NU11TUluOFoyU3I0L2Z3cUNJdzZvPSJ9)
 
 As an alternative, it can be downloaded with *dataset-tools* package:
 ``` bash
